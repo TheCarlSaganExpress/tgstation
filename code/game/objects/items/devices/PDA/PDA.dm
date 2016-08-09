@@ -690,19 +690,22 @@ var/global/list/obj/item/device/pda/PDAs = list()
 	set name = "Remove Pen"
 	set src in usr
 
+	var/obj/item/weapon/pen/Pen = locate() in src
+	var/obj/item/toy/crayon/Crayon = locate() in src
+	var/obj/item/weapon/lipstick/Lip = locate() in src
+	var/obj/item/device/flashlight/pen/Penlight = locate() in src
 	if(issilicon(usr))
 		return
 
 	if (usr.canUseTopic(src))
-		var/obj/item/weapon/pen/O = locate() in src
-		if(O)
+		if(Pen || Crayon || Lip || Penlight)
 			if (istype(loc, /mob))
 				var/mob/M = loc
 				if(M.get_active_hand() == null)
-					M.put_in_hands(O)
-					usr << "<span class='notice'>You remove \the [O] from \the [src].</span>"
+					M.put_in_hands(Pen || Crayon || Lip || Penlight)
+					usr << "<span class='notice'>You remove \the [M.get_active_hand()] from \the [src].</span>"
 					return
-			O.loc = get_turf(src)
+			Pen.loc = get_turf(src)
 		else
 			usr << "<span class='warning'>This PDA does not have a pen in it!</span>"
 
@@ -730,6 +733,11 @@ var/global/list/obj/item/device/pda/PDAs = list()
 
 // access to status display signals
 /obj/item/device/pda/attackby(obj/item/C, mob/user, params)
+	var/obj/item/weapon/pen/Pen = locate() in src
+	var/obj/item/toy/crayon/Crayon = locate() in src
+	var/obj/item/weapon/lipstick/Lip = locate() in src
+	var/obj/item/device/flashlight/pen/Penlight = locate() in src
+
 	if(istype(C, /obj/item/weapon/cartridge) && !cartridge)
 		cartridge = C
 		if(!user.unEquip(C))
@@ -765,9 +773,8 @@ var/global/list/obj/item/device/pda/PDAs = list()
 		pai = C
 		user << "<span class='notice'>You slot \the [C] into [src].</span>"
 		updateUsrDialog()
-	else if(istype(C, /obj/item/weapon/pen))
-		var/obj/item/weapon/pen/O = locate() in src
-		if(O)
+	else if(istype(C, /obj/item/weapon/pen) || istype(C, /obj/item/toy/crayon) || istype(C, /obj/item/weapon/lipstick) || istype(C, /obj/item/device/flashlight/pen))
+		if(Pen || Crayon || Lip || Penlight)
 			user << "<span class='warning'>There is already a pen in \the [src]!</span>"
 		else
 			if(!user.unEquip(C))
